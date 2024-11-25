@@ -10,13 +10,11 @@ import { WishlistsModule } from './wishlists/wishlists.module';
 
 @Module({
   imports: [
-    // Подключение ConfigModule с валидацией
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema,
     }),
 
-    // Подключение TypeOrmModule
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) =>
