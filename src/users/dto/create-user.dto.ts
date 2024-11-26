@@ -1,11 +1,29 @@
-export class CreateUserDto {}
+import {
+  IsString,
+  Length,
+  IsOptional,
+  IsEmail,
+  IsNotEmpty,
+  IsUrl,
+} from 'class-validator';
 
-/*
-TODO
-В DTO
-1) указать минимальную длину DTO для username
-2) указать ссылочный тип для avatar
-3) для почты указать валидатор
-4) 
+export class CreateUserDto {
+  @IsString()
+  @Length(2, 30)
+  name: string;
 
-*/
+  @IsOptional()
+  @IsString()
+  @Length(2, 200)
+  about?: string;
+
+  @IsOptional()
+  @IsUrl()
+  avatar?: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  password: string;
+}
