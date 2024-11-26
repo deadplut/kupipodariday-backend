@@ -3,8 +3,9 @@ import { BaseEntity } from 'src/common/entities/base.entity';
 import { Offer } from 'src/offers/entities/offer.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Wishlist } from 'src/wishlists/entities/wishlist.entity';
-import { Column, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 
+@Entity()
 export class Wish extends BaseEntity {
   @Column({ length: 250, nullable: false })
   name: string;
