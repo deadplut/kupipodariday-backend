@@ -6,7 +6,7 @@ import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity()
 export class User extends BaseEntity {
-  @Column({ length: 30, nullable: false, unique: true }) // Ограничение длины и запрет NULL
+  @Column({ length: 30, nullable: false, unique: true })
   name: string;
 
   @Column({ length: 200, default: 'Пока ничего не рассказал о себе' })

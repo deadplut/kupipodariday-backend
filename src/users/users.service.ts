@@ -21,13 +21,25 @@ export class UsersService {
     return this.userRepository.find();
   }
 
-  async findOne(id: number): Promise<User> {
+  async findById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({
-      where: { id },
+      where: { id: id },
     });
 
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    return user;
+  }
+
+  async findByName(name: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { name: name },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with name ${name} not found`);
     }
 
     return user;

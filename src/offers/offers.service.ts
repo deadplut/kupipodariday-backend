@@ -4,6 +4,11 @@ import { UpdateOfferDto } from './dto/update-offer.dto';
 
 @Injectable()
 export class OffersService {
+  // constructor(
+  //   @InjectRepository(Offer)
+  //   private readonly offerRepository: Repository<Offer>,
+  //   private readonly usersService: UsersService,
+  // ) {}
   create(createOfferDto: CreateOfferDto) {
     return 'This action adds a new offer';
   }
