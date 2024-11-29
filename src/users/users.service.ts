@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { HashService } from 'src/hash/hash.service';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -10,6 +11,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly hashService: HashService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -45,7 +47,24 @@ export class UsersService {
     return user;
   }
 
+  async findByFields(query: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: [{ name: query }, { email: query }],
+    });
+
+    if (!user) {
+      throw new NotFoundException(
+        `User with name or email "${query}" not found`,
+      );
+    }
+
+    return user;
+  }
+
   async updateOne(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    const hashedPassword = await this.hashService.hashPassword(
+      updateUserDto.password,
+    );
     const user = await this.userRepository.findOne({
       where: { id },
     });
@@ -54,7 +73,7 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    Object.assign(user, updateUserDto);
+    Object.assign(user, { ...updateUserDto, password: hashedPassword });
 
     return this.userRepository.save(user);
   }

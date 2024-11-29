@@ -19,12 +19,6 @@ export class UpdateWishDto extends PartialType(CreateWishDto) {
   name?: string;
 
   @IsOptional()
-  @IsNotEmpty()
-  @IsInt()
-  @Type(() => Number)
-  owner?: number;
-
-  @IsOptional()
   @IsUrl()
   link?: string;
 
@@ -41,24 +35,6 @@ export class UpdateWishDto extends PartialType(CreateWishDto) {
 
   @IsOptional()
   @IsString()
-  @Matches(/^\d+(\.\d{1,2})?$/, {
-    message: 'Amount must be a valid number with up to 2 decimal places',
-  })
-  raised?: number;
-
-  @IsOptional()
-  @IsString()
   @Length(1, 1024)
   description?: string;
-
-  @IsOptional()
-  @IsInt()
-  @IsPositive()
-  copied?: number;
-
-  @IsOptional()
-  @IsNotEmpty()
-  @IsInt()
-  @Type(() => Number)
-  wishlist?: number;
 }

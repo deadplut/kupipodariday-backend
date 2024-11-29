@@ -1,21 +1,7 @@
-import { Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsInt,
-  IsNotEmpty,
-  IsString,
-  Matches,
-} from 'class-validator';
+import { IsBoolean, IsNumber, IsString, Matches } from 'class-validator';
 
 export class CreateOfferDto {
-  @IsNotEmpty()
-  @IsInt()
-  @Type(() => Number)
-  user: number;
-
-  @IsNotEmpty()
-  @IsInt()
-  @Type(() => Number)
+  @IsNumber()
   item: number;
 
   @IsString()

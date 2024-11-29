@@ -15,12 +15,6 @@ export class UpdateOfferDto extends PartialType(CreateOfferDto) {
   @IsNotEmpty()
   @IsInt()
   @Type(() => Number)
-  user: number;
-
-  @IsOptional()
-  @IsNotEmpty()
-  @IsInt()
-  @Type(() => Number)
   item: number;
 
   @IsOptional()
