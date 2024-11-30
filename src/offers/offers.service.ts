@@ -31,6 +31,7 @@ export class OffersService {
   findAll(): Promise<Offer[]> {
     return this.offerRepository.find();
   }
+
   async findById(id: number): Promise<Offer> {
     const offer = await this.offerRepository.findOne({
       where: { id: id },
