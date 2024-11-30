@@ -1,13 +1,4 @@
-import { Transform, Type } from 'class-transformer';
-import {
-  IsInt,
-  IsNotEmpty,
-  IsPositive,
-  IsString,
-  IsUrl,
-  Length,
-  Matches,
-} from 'class-validator';
+import { IsString, IsUrl, Length, Matches } from 'class-validator';
 
 export class CreateWishDto {
   @IsString()

@@ -78,12 +78,12 @@ export class UsersController {
   }
 
   @Post('find')
-  async search(
+  async findMany(
     @Body() findUsersDto: FindUsersDto,
-  ): Promise<UserProfileResponseDto> {
+  ): Promise<UserProfileResponseDto[]> {
     const { query } = findUsersDto;
-    const user = await this.usersService.findByFields(query);
-    return plainToInstance(UserProfileResponseDto, user, {
+    const users = await this.usersService.findByFields(query);
+    return plainToInstance(UserProfileResponseDto, users, {
       excludeExtraneousValues: true,
     });
   }

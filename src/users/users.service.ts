@@ -47,18 +47,11 @@ export class UsersService {
     return user;
   }
 
-  async findByFields(query: string): Promise<User> {
-    const user = await this.userRepository.findOne({
+  async findByFields(query: string): Promise<User[]> {
+    const users = await this.userRepository.find({
       where: [{ name: query }, { email: query }],
     });
-
-    if (!user) {
-      throw new NotFoundException(
-        `User with name or email "${query}" not found`,
-      );
-    }
-
-    return user;
+    return users;
   }
 
   async updateOne(id: number, updateUserDto: UpdateUserDto): Promise<User> {

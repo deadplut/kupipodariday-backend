@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
@@ -11,8 +12,28 @@ export class WishesService {
     @InjectRepository(Wish)
     private readonly wishRepository: Repository<Wish>,
   ) {}
-  create(createWishDto: CreateWishDto) {
-    return 'This action adds a new wish';
+  async create(createWishDto: CreateWishDto, user: User) {
+    const newOffer = await this.wishRepository.save({
+      ...createWishDto,
+      user: user,
+    });
+    return newOffer;
+  }
+
+  getLast(): Promise<Wish> {
+    return this.wishRepository.findOne({
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+  }
+
+  getTop(): Promise<Wish> {
+    return this.wishRepository.findOne({
+      order: {
+        createdAt: 'ASC',
+      },
+    });
   }
 
   findAll() {
@@ -23,12 +44,18 @@ export class WishesService {
     return `This action returns a #${id} wish`;
   }
 
-  update(id: number, updateWishDto: UpdateWishDto) {
-    return `This action updates a #${id} wish`;
-  }
+  async updateOne(id: number, updateWishDto: UpdateWishDto): Promise<Wish> {
+    const wish = await this.wishRepository.findOne({
+      where: { id },
+    });
 
-  remove(id: number) {
-    return `This action removes a #${id} wish`;
+    if (!wish) {
+      throw new NotFoundException(`Wish with ID ${id} not found`);
+    }
+
+    Object.assign(wish, { ...updateWishDto });
+
+    return this.wishRepository.save(wish);
   }
 
   async findById(id: number): Promise<Wish> {
@@ -41,5 +68,13 @@ export class WishesService {
     }
 
     return wish;
+  }
+
+  async removeOne(id: number): Promise<void> {
+    const result = await this.wishRepository.delete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
   }
 }
