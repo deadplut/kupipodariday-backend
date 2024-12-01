@@ -42,14 +42,6 @@ export class WishesService {
     });
   }
 
-  findAll() {
-    return `This action returns all wishes`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} wish`;
-  }
-
   async updateOne(
     id: number,
     updateWishDto: UpdateWishDto,
@@ -90,11 +82,20 @@ export class WishesService {
     return wish;
   }
 
-  async removeOne(id: number): Promise<void> {
-    const result = await this.wishRepository.delete(id);
-
-    if (result.affected === 0) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+  async removeOne(id: number, userId: number): Promise<void> {
+    const wish = await this.wishRepository.findOne({
+      where: { id: id },
+    });
+    if (!wish) {
+      throw new NotFoundException(`Wish with ID ${id} not found`);
     }
+    if (wish.owner.id == userId) {
+      throw new ForbiddenException('You are not the owner of this wish');
+    }
+    await this.wishRepository.delete(id);
+  }
+
+  async save(wish: Wish): Promise<Wish> {
+    return this.wishRepository.save(wish);
   }
 }

@@ -1,14 +1,14 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateOfferDto } from './create-offer.dto';
 import { Type } from 'class-transformer';
 import {
-  IsNotEmpty,
-  IsInt,
-  IsString,
-  Matches,
   IsBoolean,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
   IsOptional,
+  Matches,
 } from 'class-validator';
+import { CreateOfferDto } from './create-offer.dto';
 
 export class UpdateOfferDto extends PartialType(CreateOfferDto) {
   @IsOptional()
@@ -18,11 +18,11 @@ export class UpdateOfferDto extends PartialType(CreateOfferDto) {
   item: number;
 
   @IsOptional()
-  @IsString()
+  @IsNumber()
   @Matches(/^\d+(\.\d{1,2})?$/, {
     message: 'Amount must be a valid number with up to 2 decimal places',
   })
-  amount: string;
+  amount: number;
 
   @IsOptional()
   @IsBoolean()

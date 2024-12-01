@@ -12,7 +12,7 @@ export class Offer extends BaseEntity {
   item: Wish;
 
   @Column({ type: 'numeric', precision: 15, scale: 2 })
-  amount: string;
+  amount: number;
 
   @Column({ default: false })
   hidden: boolean;

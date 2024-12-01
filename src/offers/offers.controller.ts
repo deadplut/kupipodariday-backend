@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { AuthenticatedRequest } from 'src/auth/interfaces/authenticated-request.interface';
 import { UsersService } from 'src/users/users.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
@@ -17,7 +18,6 @@ import { offerResponseDto } from './dto/offer-response.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
 import { Offer } from './entities/offer.entity';
 import { OffersService } from './offers.service';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('offers')
 export class OffersController {
@@ -57,15 +57,19 @@ export class OffersController {
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(
+    @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body() updateOfferDto: UpdateOfferDto,
   ): Promise<Offer> {
-    return this.offersService.updateOne(+id, updateOfferDto);
+    return this.offersService.updateOne(+id, updateOfferDto, req.user.userId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<void> {
-    return this.offersService.removeOne(+id);
+  remove(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ): Promise<void> {
+    return this.offersService.removeOne(+id, req.user.userId);
   }
 }

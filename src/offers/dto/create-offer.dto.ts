@@ -1,14 +1,14 @@
-import { IsBoolean, IsNumber, IsString, Matches } from 'class-validator';
+import { IsBoolean, IsNumber, Matches } from 'class-validator';
 
 export class CreateOfferDto {
   @IsNumber()
   item: number;
 
-  @IsString()
+  @IsNumber()
   @Matches(/^\d+(\.\d{1,2})?$/, {
     message: 'Amount must be a valid number with up to 2 decimal places',
   })
-  amount: string;
+  amount: number;
 
   @IsBoolean()
   hidden: boolean;

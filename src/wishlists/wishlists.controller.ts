@@ -56,10 +56,15 @@ export class WishlistsController {
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async update(
+    @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body() updateWishlistDto: UpdateWishlistDto,
   ): Promise<WishlistResponseDto> {
-    const wish = await this.wishlistsService.updateOne(+id, updateWishlistDto);
+    const wish = await this.wishlistsService.updateOne(
+      +id,
+      updateWishlistDto,
+      req.user.userId,
+    );
     return plainToInstance(WishlistResponseDto, wish, {
       excludeExtraneousValues: true,
     });
@@ -67,7 +72,10 @@ export class WishlistsController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<void> {
-    return this.wishlistsService.removeOne(+id);
+  remove(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ): Promise<void> {
+    return this.wishlistsService.removeOne(+id, req.user.userId);
   }
 }

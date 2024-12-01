@@ -54,12 +54,6 @@ export class WishesController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get()
-  findAll() {
-    return this.wishesService.findAll();
-  }
-
-  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<WishResponseDto> {
     const wish = await this.wishesService.findById(+id);
@@ -87,8 +81,11 @@ export class WishesController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<void> {
-    return this.wishesService.removeOne(+id);
+  remove(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ): Promise<void> {
+    return this.wishesService.removeOne(+id, req.user.userId);
   }
 
   @UseGuards(JwtAuthGuard)

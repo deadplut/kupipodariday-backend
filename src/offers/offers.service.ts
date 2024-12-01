@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { WishesService } from 'src/wishes/wishes.service';
@@ -15,11 +19,16 @@ export class OffersService {
     private readonly wishesService: WishesService,
   ) {}
   async create(createOfferDto: CreateOfferDto, user: User): Promise<Offer> {
-    // TODO проверку свой не свой подарок
-    // TODO добавить проверку добавления экстра суммы
-    // TODO добавить добавления суммы к общей сумме подарка
-
     const wish = await this.wishesService.findById(createOfferDto.item);
+    if (user === wish.owner) {
+      throw new ForbiddenException('Do not offer for your wish');
+    }
+
+    wish.raised += createOfferDto.amount;
+    if (wish.raised > wish.price) {
+      throw new ForbiddenException('Too much money');
+    }
+    await this.wishesService.save(wish);
     const newOffer = await this.offerRepository.save({
       ...createOfferDto,
       user: user,
@@ -44,7 +53,11 @@ export class OffersService {
     return offer;
   }
 
-  async updateOne(id: number, updateOfferDto: UpdateOfferDto): Promise<Offer> {
+  async updateOne(
+    id: number,
+    updateOfferDto: UpdateOfferDto,
+    userId: number,
+  ): Promise<Offer> {
     const offer = await this.offerRepository.findOne({
       where: { id },
     });
@@ -53,12 +66,27 @@ export class OffersService {
       throw new NotFoundException(`Offer with ID ${id} not found`);
     }
 
+    if (offer.user.id != userId) {
+      throw new ForbiddenException('You are not the owner of this offer');
+    }
+
     Object.assign(offer, updateOfferDto);
 
     return this.offerRepository.save(offer);
   }
 
-  async removeOne(id: number): Promise<void> {
+  async removeOne(id: number, userId: number): Promise<void> {
+    const offer = await this.offerRepository.findOne({
+      where: { id },
+    });
+
+    if (!offer) {
+      throw new NotFoundException(`Offer with ID ${id} not found`);
+    }
+
+    if (offer.user.id != userId) {
+      throw new ForbiddenException('You are not the owner of this offer');
+    }
     const result = await this.offerRepository.delete(id);
 
     if (result.affected === 0) {

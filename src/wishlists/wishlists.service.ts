@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -37,6 +41,7 @@ export class WishlistsService {
   async updateOne(
     id: number,
     updateWishlistDto: UpdateWishlistDto,
+    userId: number,
   ): Promise<Wishlist> {
     const wishlist = await this.wishlistRepository.findOne({
       where: { id },
@@ -46,16 +51,25 @@ export class WishlistsService {
       throw new NotFoundException(`Offer with ID ${id} not found`);
     }
 
+    if (wishlist.user.id == userId) {
+      throw new ForbiddenException('You are not the owner of this wishlist');
+    }
+
     Object.assign(wishlist, updateWishlistDto);
 
     return this.wishlistRepository.save(wishlist);
   }
 
-  async removeOne(id: number): Promise<void> {
-    const result = await this.wishlistRepository.delete(id);
-
-    if (result.affected === 0) {
+  async removeOne(id: number, userId: number): Promise<void> {
+    const wishlist = await this.wishlistRepository.findOne({
+      where: { id: id },
+    });
+    if (!wishlist) {
       throw new NotFoundException(`wishlist with ID ${id} not found`);
     }
+    if (wishlist.user.id == userId) {
+      throw new ForbiddenException('You are not the owner of this wishlist');
+    }
+    await this.wishlistRepository.delete(id);
   }
 }

@@ -19,7 +19,16 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
+    const user_ib_db = this.userRepository.findOne({
+      where: { email: createUserDto.email, name: createUserDto.name },
+    });
+    if (user_ib_db) {
+      throw new ForbiddenException(
+        'Пользователь с таким именем или email уже существует',
+      );
+    }
     const user = this.userRepository.create(createUserDto);
+
     return this.userRepository.save(user);
   }
 
@@ -66,6 +75,14 @@ export class UsersService {
     if (id != userId) {
       throw new ForbiddenException('You are not the owner of this profi;e');
     }
+    const user_ib_db = this.userRepository.findOne({
+      where: { email: updateUserDto.email, name: updateUserDto.name },
+    });
+    if (user_ib_db) {
+      throw new ForbiddenException(
+        'Пользователь с таким именем или email уже существует',
+      );
+    }
 
     const hashedPassword = await this.hashService.hashPassword(
       updateUserDto.password,
@@ -92,5 +109,9 @@ export class UsersService {
     if (result.affected === 0) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
+  }
+
+  findOne(id: number) {
+    return `This action returns a #${id} wish`;
   }
 }
