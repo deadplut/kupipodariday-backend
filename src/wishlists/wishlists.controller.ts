@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Request,
+  UseGuards,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { AuthenticatedRequest } from 'src/auth/interfaces/authenticated-request.interface';
@@ -15,6 +16,7 @@ import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 import { WishlistResponseDto } from './dto/wishlist-response.dto';
 import { WishlistsService } from './wishlists.service';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('wishlists')
 export class WishlistsController {
@@ -23,6 +25,7 @@ export class WishlistsController {
     private readonly usersService: UsersService,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   async create(
     @Request() req: AuthenticatedRequest,
@@ -32,6 +35,7 @@ export class WishlistsController {
     return this.wishlistsService.create(createWishlistDto, user);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   async findAll() {
     const wishlist = await this.wishlistsService.findAll();
@@ -40,6 +44,7 @@ export class WishlistsController {
     });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<WishlistResponseDto> {
     const wishlist = await this.wishlistsService.findById(+id);
@@ -48,6 +53,7 @@ export class WishlistsController {
     });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -59,6 +65,7 @@ export class WishlistsController {
     });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string): Promise<void> {
     return this.wishlistsService.removeOne(+id);

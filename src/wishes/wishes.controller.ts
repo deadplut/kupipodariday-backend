@@ -7,8 +7,10 @@ import {
   Patch,
   Post,
   Request,
+  UseGuards,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { AuthenticatedRequest } from 'src/auth/interfaces/authenticated-request.interface';
 import { UsersService } from 'src/users/users.service';
 import { CreateWishDto } from './dto/create-wish.dto';
@@ -23,6 +25,7 @@ export class WishesController {
     private readonly usersService: UsersService,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   async create(
     @Request() req: AuthenticatedRequest,
@@ -33,26 +36,30 @@ export class WishesController {
   }
 
   @Get('last')
-  async getLastWish(): Promise<WishResponseDto> {
-    const wish = await this.wishesService.getLast();
-    return plainToInstance(WishResponseDto, wish, {
+  async getLastWish(): Promise<WishResponseDto[]> {
+    const wishes = await this.wishesService.getLast();
+    return plainToInstance(WishResponseDto, wishes, {
       excludeExtraneousValues: true,
+      groups: ['common'],
     });
   }
 
   @Get('top')
-  async getTopWish(): Promise<WishResponseDto> {
-    const wish = await this.wishesService.getTop();
-    return plainToInstance(WishResponseDto, wish, {
+  async getTopWish(): Promise<WishResponseDto[]> {
+    const wishes = await this.wishesService.getTop();
+    return plainToInstance(WishResponseDto, wishes, {
       excludeExtraneousValues: true,
+      groups: ['common'],
     });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.wishesService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<WishResponseDto> {
     const wish = await this.wishesService.findById(+id);
@@ -61,22 +68,30 @@ export class WishesController {
     });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async update(
+    @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body() updateWishDto: UpdateWishDto,
   ): Promise<WishResponseDto> {
-    const wish = await this.wishesService.updateOne(+id, updateWishDto);
+    const wish = await this.wishesService.updateOne(
+      +id,
+      updateWishDto,
+      req.user.userId,
+    );
     return plainToInstance(WishResponseDto, wish, {
       excludeExtraneousValues: true,
     });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string): Promise<void> {
     return this.wishesService.removeOne(+id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post(':id/copy')
   async copy(
     @Request() req: AuthenticatedRequest,

@@ -43,6 +43,7 @@ export class UsersController {
     const user = await this.usersService.updateOne(
       req.user.userId,
       updateUserDto,
+      req.user.userId,
     );
     return plainToInstance(UserProfileResponseDto, user, {
       excludeExtraneousValues: true,
@@ -77,6 +78,7 @@ export class UsersController {
     return this.usersService.findByName(username);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('find')
   async findMany(
     @Body() findUsersDto: FindUsersDto,
@@ -88,23 +90,31 @@ export class UsersController {
     });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.updateOne(+id, updateUserDto);
+  update(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.usersService.updateOne(+id, updateUserDto, req.user.userId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.removeOne(+id);
+  remove(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
+    return this.usersService.removeOne(+id, req.user.userId);
   }
 }

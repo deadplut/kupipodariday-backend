@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -20,19 +24,21 @@ export class WishesService {
     return newOffer;
   }
 
-  getLast(): Promise<Wish> {
-    return this.wishRepository.findOne({
+  getLast(): Promise<Wish[]> {
+    return this.wishRepository.find({
       order: {
         createdAt: 'DESC',
       },
+      take: 40,
     });
   }
 
-  getTop(): Promise<Wish> {
-    return this.wishRepository.findOne({
+  getTop(): Promise<Wish[]> {
+    return this.wishRepository.find({
       order: {
-        createdAt: 'ASC',
+        copied: 'DESC',
       },
+      take: 20,
     });
   }
 
@@ -44,13 +50,27 @@ export class WishesService {
     return `This action returns a #${id} wish`;
   }
 
-  async updateOne(id: number, updateWishDto: UpdateWishDto): Promise<Wish> {
+  async updateOne(
+    id: number,
+    updateWishDto: UpdateWishDto,
+    userId: number,
+  ): Promise<Wish> {
     const wish = await this.wishRepository.findOne({
       where: { id },
     });
 
     if (!wish) {
       throw new NotFoundException(`Wish with ID ${id} not found`);
+    }
+
+    if (wish.owner.id != userId) {
+      throw new ForbiddenException('You are not the owner of this wish');
+    }
+
+    if (wish.raised > 0) {
+      throw new ForbiddenException(
+        'Пользователь может отредактировать описание своих подарков и стоимость, если только никто ещё не решил скинуться.',
+      );
     }
 
     Object.assign(wish, { ...updateWishDto });

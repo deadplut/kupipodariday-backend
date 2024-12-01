@@ -4,32 +4,32 @@ import { offerResponseDto } from 'src/offers/dto/offer-response.dto';
 import { UserProfileResponseDto } from 'src/users/dto/user-profile-response.dto';
 
 export class WishResponseDto extends BaseResponseDto {
-  @Expose()
+  @Expose({ groups: ['common'] })
   name: string;
 
-  @Expose()
+  @Expose({ groups: ['common'] })
   link: string;
 
-  @Expose()
+  @Expose({ groups: ['common'] })
   image: string;
 
-  @Expose()
+  @Expose({ groups: ['common'] })
   price: number;
 
-  @Expose()
+  @Expose({ groups: ['common'] })
   description: string;
 
-  @Expose()
+  @Expose({ groups: ['common'] })
   raised: number;
 
-  @Expose()
+  @Expose({ groups: ['common'] })
   copied: number;
 
-  @Expose()
+  @Expose({ groups: ['common'] })
   @Type(() => UserProfileResponseDto)
   owner: UserProfileResponseDto;
 
-  @Expose()
+  @Expose({ groups: ['auth'] })
   @Type(() => offerResponseDto)
   offers: offerResponseDto[];
 }

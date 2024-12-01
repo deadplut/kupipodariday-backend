@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashService } from 'src/hash/hash.service';
 import { Repository } from 'typeorm';
@@ -54,7 +58,15 @@ export class UsersService {
     return users;
   }
 
-  async updateOne(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+  async updateOne(
+    id: number,
+    updateUserDto: UpdateUserDto,
+    userId: number,
+  ): Promise<User> {
+    if (id != userId) {
+      throw new ForbiddenException('You are not the owner of this profi;e');
+    }
+
     const hashedPassword = await this.hashService.hashPassword(
       updateUserDto.password,
     );
@@ -71,7 +83,10 @@ export class UsersService {
     return this.userRepository.save(user);
   }
 
-  async removeOne(id: number): Promise<void> {
+  async removeOne(id: number, userId: number): Promise<void> {
+    if (id != userId) {
+      throw new ForbiddenException('You are not the owner of this profi;e');
+    }
     const result = await this.userRepository.delete(id);
 
     if (result.affected === 0) {
